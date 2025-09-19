@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTask } from '../redux/slices/taskSlice';
@@ -14,7 +15,11 @@ const TaskForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.memberId && formData.title && formData.dueDate) {
-      dispatch(addTask(formData));
+      dispatch(addTask({
+        memberId: parseInt(formData.memberId),
+        title: formData.title,
+        dueDate: formData.dueDate
+      }));
       setFormData({ memberId: '', title: '', dueDate: '' });
     }
   };
@@ -32,10 +37,17 @@ const TaskForm = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Team Member:</label>
-          <select name="memberId" value={formData.memberId} onChange={handleChange} required>
+          <select 
+            name="memberId" 
+            value={formData.memberId} 
+            onChange={handleChange} 
+            required
+          >
             <option value="">Select a member</option>
             {members.map(member => (
-              <option key={member.id} value={member.id}>{member.name}</option>
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
             ))}
           </select>
         </div>
@@ -47,6 +59,7 @@ const TaskForm = () => {
             value={formData.title} 
             onChange={handleChange} 
             required 
+            placeholder="Enter task title"
           />
         </div>
         <div className="form-group">

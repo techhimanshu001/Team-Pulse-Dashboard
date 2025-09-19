@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 const MemberCard = ({ member }) => {
   const tasks = useSelector(state => state.tasks.tasks);
   const memberTasks = tasks.filter(task => task.memberId === member.id);
-  const activeTasks = memberTasks.filter(task => task.progress < 100).length;
+  const activeTasks = memberTasks.filter(task => !task.completed).length;
+  const completedTasks = memberTasks.filter(task => task.completed).length;
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -24,8 +25,9 @@ const MemberCard = ({ member }) => {
         </span>
       </div>
       <div className="member-stats">
-        <p>Active Tasks: {activeTasks}</p>
-        <p>Total Tasks: {memberTasks.length}</p>
+        <p>Active Tasks: <span className="stat-number">{activeTasks}</span></p>
+        <p>Completed Tasks: <span className="stat-number">{completedTasks}</span></p>
+        <p>Total Tasks: <span className="stat-number">{memberTasks.length}</span></p>
       </div>
     </div>
   );

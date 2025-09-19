@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateProgress } from '../redux/slices/taskSlice';
+import { updateProgress, deleteTask } from '../redux/slices/taskSlice';
 
 const TaskList = () => {
   const dispatch = useDispatch();
@@ -21,34 +22,68 @@ const TaskList = () => {
     }
   };
 
+  const handleDeleteTask = (taskId) => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
+      dispatch(deleteTask(taskId));
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const isOverdue = (dueDate) => {
+    return new Date(dueDate) < new Date() && new Date(dueDate).setHours(0,0,0,0) !== new Date().setHours(0,0,0,0);
+  };
+
   return (
     <div className="task-list">
       <h3>Your Tasks</h3>
-      {userTasks.length === 0 ? (
-        <p>No tasks assigned</p>
-      ) : (
-        userTasks.map(task => (
-          <div key={task.id} className="task-item">
-            <div className="task-info">
-              <h4>{task.title}</h4>
-              <p>Due: {new Date(task.dueDate).toLocaleDateString()}</p>
-            </div>
-            <div className="task-progress">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${task.progress}%` }}
-                ></div>
-              </div>
-              <span>{task.progress}%</span>
-              <div className="progress-controls">
-                <button onClick={() => handleProgressChange(task.id, -10)}>-10%</button>
-                <button onClick={() => handleProgressChange(task.id, 10)}>+10%</button>
-              </div>
-            </div>
-          </div>
-        ))
-      )}
+      {userTasks.map(task => (
+  <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+    <div className="task-info">
+      <h4>{task.title}</h4>
+      <p className={`due-date ${isOverdue(task.dueDate) && !task.completed ? 'overdue' : ''}`}>
+        Due: {formatDate(task.dueDate)}
+        {isOverdue(task.dueDate) && !task.completed && ' (Overdue)'}
+      </p>
+      {task.completed && <span className="completed-badge">Completed</span>}
+    </div>
+    <div className="task-progress">
+      <div className="progress-header">
+        <span>Progress</span>
+        <span>{task.progress}%</span>
+      </div>
+      <div className="progress-bar">
+        <div 
+          className="progress-fill" 
+          style={{ width: `${task.progress}%` }}
+        ></div>
+      </div>
+      <div className="progress-controls">
+        <button 
+          onClick={() => handleProgressChange(task.id, -10)}
+          disabled={task.progress <= 0}
+        >
+          -10%
+        </button>
+        <button 
+          onClick={() => handleProgressChange(task.id, 10)}
+          disabled={task.progress >= 100}
+        >
+          +10%
+        </button>
+        <button 
+          className="delete-btn"
+          onClick={() => handleDeleteTask(task.id)}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+))}
     </div>
   );
 };
