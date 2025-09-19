@@ -1,24 +1,39 @@
-import logo from './logo.svg';
+import React from 'react';
+import { Provider, useSelector } from 'react-redux';
+import { store } from './redux/store';
+import Header from './components/Header';
+import Dashboard from './pages/Dashboard';
 import './App.css';
+
+// Theme wrapper component
+function ThemeWrapper({ children }) {
+  const theme = useSelector(state => state.theme.mode);
+  
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+  
+  return <>{children}</>;
+}
+
+function AppContent() {
+  return (
+    <div className="App">
+      <Header />
+      <main className="main-content">
+        <Dashboard />
+      </main>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <ThemeWrapper>
+        <AppContent />
+      </ThemeWrapper>
+    </Provider>
   );
 }
 
